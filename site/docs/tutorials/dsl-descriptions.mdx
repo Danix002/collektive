@@ -12,7 +12,10 @@ The aggregate operators and field operations present in Collektive are illustrat
 export default function OperatorList() {
 const operators = [
 { name: "## Aggregate Operators", description: "" }, 
-{ name: "[exchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)", description: "![](/img/exchange.svg)" },
+{ name: "[exchange](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchange.html)", description: `
+<img src="/img/exchange.svg" alt="Exchange" style="display: block; margin: auto;" /> 
+
+**Exchange** is the foundation of **XC**, has the crucial aspect that can send different values to each neighbour, allowing custom interaction between them. It models the space-time evolution of the device. ` },
 { name: "[exchanging](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api/-aggregate/exchanging.html)", description: "" },
 { name: "[share](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/share.html)", description: "![](/img/share.svg)" },
 { name: "[sharing](https://javadoc.io/doc/it.unibo.collektive/dsl/latest/dsl/it.unibo.collektive.aggregate.api.operators/sharing.html)", description: `` },
@@ -117,7 +120,7 @@ return (
                         style={{ backgroundColor: 'transparent', border: '1px solid purple', borderRadius: '5px', padding: '5px' }}
                     >
                     <summary>Click to view description</summary>
-                    <ReactMarkdown>
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
                         {op.description}
                     </ReactMarkdown>
                     </details>

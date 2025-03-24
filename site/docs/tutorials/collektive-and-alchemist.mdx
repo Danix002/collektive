@@ -104,7 +104,7 @@ export:
         type: Event
         actions:
         - type: RunCollektiveProgram
-            parameters: [it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID]
+            parameters: [it.unibo.collektive.examples.maxId.MaxIdKt.maxID]
 
     deployments:
     - type: GraphStreamDeployment
@@ -193,7 +193,7 @@ Once the YAML configuration file has been created, it is necessary to generate a
         "molFilter": true,
         "molString": "isSubnetDiameterDistance",
         "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
+        "property": "if (it == true) 1 else 0",
         "writingPropertyValue": false,
         "c": "ALPHA",
         "reverse": false,
@@ -253,7 +253,7 @@ Once the YAML configuration file has been created, it is necessary to generate a
         "molFilter": true,
         "molString": "nothing",
         "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
+        "property": "if (it == true) 1 else 0",
         "writingPropertyValue": false,
         "c": "ALPHA",
         "reverse": false,
@@ -313,7 +313,7 @@ Once the YAML configuration file has been created, it is necessary to generate a
         "molFilter": true,
         "molString": "isMaxLocalID",
         "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
+        "property": "if (it == true) 1 else 0",
         "writingPropertyValue": false,
         "c": "ALPHA",
         "reverse": false,
@@ -373,7 +373,7 @@ Once the YAML configuration file has been created, it is necessary to generate a
         "molFilter": true,
         "molString": "isMaxID",
         "molPropertyFilter": true,
-        "property": "if (it \u003d\u003d true) 1 else 0",
+        "property": "if (it == true) 1 else 0",
         "writingPropertyValue": false,
         "c": "ALPHA",
         "reverse": false,
@@ -431,7 +431,7 @@ Once the YAML configuration file has been created, it is necessary to generate a
         "val": 5
         },
         "molFilter": true,
-        "molString": "it.unibo.collektive.examples.tutorialExample.TutorialExampleKt.maxID",
+        "molString": "it.unibo.collektive.examples.maxId.MaxIdKt.maxID",
         "molPropertyFilter": true,
         "property": "",
         "writingPropertyValue": true,
@@ -489,39 +489,25 @@ This graph shows the average of the maximum distance of the three subnets, which
 Below is presented the example code, including the logic for Alchemist Simulator.
 
 ```kotlin
-fun Aggregate<Int>.maxID(environment: EnvironmentVariables): Int {
+fun Aggregate<Int>.maxNetworkID(environment: EnvironmentVariables): Int {
     val maxLocalValue = maxNeighborID()
 
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["localID"] = localId
     environment["isMaxLocalID"] = localId == maxLocalValue
     environment["maxNeighborID"] = maxLocalValue
 
-    // Step 1: Exchange the maxNeighborID with neighbors and obtain a field of values
-    val neighborValues = neighboring(local = maxLocalValue)
+    val maxValue = neighboring(maxLocalValue).max(maxLocalValue)
 
-    // Step 2: Find the maximum value among neighbors (including self)
-    val maxValue = neighborValues.max(base = maxLocalValue)
-
-    // Collektive & Alchemist: Assign the result to a molecule 
     environment["isMaxID"] = localId == maxValue
     environment["maxNetworkID"] = maxValue
+    environment["distanceToSource"] = hopDistanceTo(environment["isMaxID"])
 
-    /* Third part */
+    val subnetDiameter = subnetDiameter(environment["maxNetworkID"], environment["distanceToSource"])
 
-    // Preliminary step: the distance from the nearest source is calculated using the distanceTo library function 
-    environment["distanceToSource"] = distanceToSource(environment["isMaxID"])
-
-    // Calculate subnets diameter 
-    val subnetDiameterValue = subnetDiameter(environment["maxNetworkID"], environment["distanceToSource"])
-
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["subnetDiameter"] = subnetDiameterValue
+    environment["subnetDiameter"] = subnetDiameter
 
     val subnetDiameterDistance = subnetDiameter.distance
 
-    // Collektive & Alchemist: Assign the result to a molecule
-    environment["subnetDiameterValue"] = subnetDiameterDistance
+    environment["subnetDiameterDistance"] = subnetDiameterDistance
     environment["isSubnetDiameterDistance"] = subnetDiameterDistance == environment["distanceToSource"]
     environment["nothing"] =  !(environment["isSubnetDiameterDistance"] || environment["isMaxID"] || environment["isMaxLocalID"])
 
